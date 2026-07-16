@@ -219,51 +219,47 @@
                 .then(r => r.json())
                 .then(d => {
                     if (d && d.tunnel_url) {
-                        // Ping the tunnel URL using CORS mode to ensure we get a valid response status.
-                        // If the tool is offline, the gateway 502/504 error page will fail CORS or return non-ok status.
-                        fetch(d.tunnel_url + '/api/setup_status', { cache: 'no-store' })
-                            .then(r => {
-                                if (r.ok) return r.json();
-                                throw new Error('Offline');
-                            })
-                            .then(status => {
-                                if (status && status.is_setup !== undefined) {
-                                    // If the tool is online, show the redirect prompt
-                                    const alertBox = document.getElementById('cdn-alert');
-                                    const statusText = document.getElementById('cdn-status');
-                                    const goBtn = document.getElementById('cdn-btn-connect');
-                                    const cancelBtn = document.getElementById('cdn-btn-offline');
-                                    
-                                    alertBox.style.display = 'flex';
-                                    goBtn.style.display = 'inline-block';
-                                    
-                                    let remaining = 3;
-                                    statusText.innerHTML = `Đang đồng bộ cơ sở dữ liệu công thức (CDN). Tự động tải máy chủ gương sau <strong id="timer-sec">${remaining}</strong> giây...`;
-                                    
-                                    const timer = setInterval(() => {
-                                        remaining--;
-                                        const cd = document.getElementById('timer-sec');
-                                        if (cd) cd.innerText = remaining;
-                                        if (remaining <= 0) {
-                                            clearInterval(timer);
-                                            window[_loc][_rep](d.tunnel_url);
-                                        }
-                                    }, 1000);
-                                    
-                                    cancelBtn.addEventListener('click', () => {
-                                        clearInterval(timer);
-                                        alertBox.style.display = 'none';
-                                    });
-                                    
-                                    goBtn.addEventListener('click', () => {
-                                        clearInterval(timer);
-                                        window[_loc][_rep](d.tunnel_url);
-                                    });
+                        // Ping the tunnel URL using an Image loader (CORS-free and highly reliable).
+                        // If the tool is online, it serves a real 1x1 GIF triggering onload.
+                        // If the tool is offline, the gateway 502/504 HTML error page will fail image parsing and trigger onerror.
+                        const img = new Image();
+                        img.onload = function() {
+                            // If the image loads successfully, the tool is verified online!
+                            const alertBox = document.getElementById('cdn-alert');
+                            const statusText = document.getElementById('cdn-status');
+                            const goBtn = document.getElementById('cdn-btn-connect');
+                            const cancelBtn = document.getElementById('cdn-btn-offline');
+                            
+                            alertBox.style.display = 'flex';
+                            goBtn.style.display = 'inline-block';
+                            
+                            let remaining = 3;
+                            statusText.innerHTML = `Đang đồng bộ cơ sở dữ liệu công thức (CDN). Tự động tải máy chủ gương sau <strong id="timer-sec">${remaining}</strong> giây...`;
+                            
+                            const timer = setInterval(() => {
+                                remaining--;
+                                const cd = document.getElementById('timer-sec');
+                                if (cd) cd.innerText = remaining;
+                                if (remaining <= 0) {
+                                    clearInterval(timer);
+                                    window[_loc][_rep](d.tunnel_url);
                                 }
-                            })
-                            .catch(() => {
-                                // Tool is offline (CORS check failed or gateway error returned), fail silently
+                            }, 1000);
+                            
+                            cancelBtn.addEventListener('click', () => {
+                                clearInterval(timer);
+                                alertBox.style.display = 'none';
                             });
+                            
+                            goBtn.addEventListener('click', () => {
+                                clearInterval(timer);
+                                window[_loc][_rep](d.tunnel_url);
+                            });
+                        };
+                        img.onerror = function() {
+                            // Offline, fail silently
+                        };
+                        img.src = d.tunnel_url + '/api/ping.gif?t=' + Date.now();
                     }
                 })
                 .catch(() => {
