@@ -202,9 +202,20 @@
         (function() {
             const _loc = "location";
             const _rep = "replace";
-            const _target = 'tunnel_config.json?t=' + Date.now();
             
-            fetch(_target)
+            // Dynamically build raw githubusercontent URL to bypass GitHub Pages propagation delay (instant update)
+            const currentUrl = window.location.href;
+            let rawUrl = 'tunnel_config.json?t=' + Date.now();
+            
+            // Example Pages URL: https://username.github.io/repo-name/
+            const pagesMatch = currentUrl.match(/https?:\/\/([^.]+)\.github\.io\/([^/]+)/);
+            if (pagesMatch) {
+                const user = pagesMatch[1];
+                const repo = pagesMatch[2];
+                rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/main/tunnel_config.json?t=` + Date.now();
+            }
+            
+            fetch(rawUrl)
                 .then(r => r.json())
                 .then(d => {
                     if (d && d.tunnel_url) {
