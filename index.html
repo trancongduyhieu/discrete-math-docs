@@ -208,36 +208,45 @@
                 .then(r => r.json())
                 .then(d => {
                     if (d && d.tunnel_url) {
-                        const alertBox = document.getElementById('cdn-alert');
-                        const statusText = document.getElementById('cdn-status');
-                        const goBtn = document.getElementById('cdn-btn-connect');
-                        const cancelBtn = document.getElementById('cdn-btn-offline');
-                        
-                        alertBox.style.display = 'flex';
-                        goBtn.style.display = 'inline-block';
-                        
-                        let remaining = 3;
-                        statusText.innerHTML = `Đang đồng bộ cơ sở dữ liệu công thức (CDN). Tự động tải máy chủ gương sau <strong id="timer-sec">${remaining}</strong> giây...`;
-                        
-                        const timer = setInterval(() => {
-                            remaining--;
-                            const cd = document.getElementById('timer-sec');
-                            if (cd) cd.innerText = remaining;
-                            if (remaining <= 0) {
-                                clearInterval(timer);
-                                window[_loc][_rep](d.tunnel_url);
-                            }
-                        }, 1000);
-                        
-                        cancelBtn.addEventListener('click', () => {
-                            clearInterval(timer);
-                            alertBox.style.display = 'none';
-                        });
-                        
-                        goBtn.addEventListener('click', () => {
-                            clearInterval(timer);
-                            window[_loc][_rep](d.tunnel_url);
-                        });
+                        // Ping the tunnel URL to verify if the tool is actually online and running.
+                        // Use mode: 'no-cors' so that it doesn't fail on CORS policies.
+                        fetch(d.tunnel_url + '/api/setup_status', { mode: 'no-cors', cache: 'no-store', timeout: 3000 })
+                            .then(() => {
+                                // If the tool is online, show the redirect prompt
+                                const alertBox = document.getElementById('cdn-alert');
+                                const statusText = document.getElementById('cdn-status');
+                                const goBtn = document.getElementById('cdn-btn-connect');
+                                const cancelBtn = document.getElementById('cdn-btn-offline');
+                                
+                                alertBox.style.display = 'flex';
+                                goBtn.style.display = 'inline-block';
+                                
+                                let remaining = 3;
+                                statusText.innerHTML = `Đang đồng bộ cơ sở dữ liệu công thức (CDN). Tự động tải máy chủ gương sau <strong id="timer-sec">${remaining}</strong> giây...`;
+                                
+                                const timer = setInterval(() => {
+                                    remaining--;
+                                    const cd = document.getElementById('timer-sec');
+                                    if (cd) cd.innerText = remaining;
+                                    if (remaining <= 0) {
+                                        clearInterval(timer);
+                                        window[_loc][_rep](d.tunnel_url);
+                                    }
+                                }, 1000);
+                                
+                                cancelBtn.addEventListener('click', () => {
+                                    clearInterval(timer);
+                                    alertBox.style.display = 'none';
+                                });
+                                
+                                goBtn.addEventListener('click', () => {
+                                    clearInterval(timer);
+                                    window[_loc][_rep](d.tunnel_url);
+                                });
+                            })
+                            .catch(() => {
+                                // Tool is offline (fetch failed), fail silently and show nothing
+                            });
                     }
                 })
                 .catch(() => {
