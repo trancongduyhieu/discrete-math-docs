@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài liệu Ôn tập Toán rời rạc & Thiết kế Giải thuật</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f6f5f2;
+            --container-bg: #fdfdfc;
+            --text-primary: #1a1816;
+            --text-secondary: #7a7570;
+            --accent-color: #a87653;
+            --accent-hover: #916342;
+            --border-color: #e2ddd3;
+            --code-bg: #eae6df;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0c0b0a;
+                --container-bg: #141312;
+                --text-primary: #eae6df;
+                --text-secondary: #969086;
+                --accent-color: #d7a884;
+                --accent-hover: #c6946e;
+                --border-color: #242220;
+                --code-bg: #211f1d;
+            }
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            line-height: 1.6;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        header {
+            max-width: 800px;
+            margin: 40px auto 20px;
+            padding: 0 20px;
+            text-align: center;
+        }
+        h1 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 36px;
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent-color);
+        }
+        main {
+            max-width: 800px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+        .banner {
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        }
+        .banner-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .banner-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+        .banner-text {
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .banner-actions {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+        }
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+        .btn-secondary {
+            background-color: var(--code-bg);
+            color: var(--text-primary);
+        }
+        .section-card {
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+        h2 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 24px;
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        pre {
+            background-color: var(--code-bg);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            background-color: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="subtitle">Hệ thống ngụy trang thông tin</div>
+        <h1>Toán rời rạc & Thiết kế Giải thuật</h1>
+    </header>
+    <main>
+        <div class="banner" id="redirect-banner">
+            <div class="banner-content">
+                <div class="banner-dot"></div>
+                <div class="banner-text" id="redirect-status">Đang tải cấu hình kết nối bảo mật...</div>
+            </div>
+            <div class="banner-actions">
+                <button class="btn-primary" id="go-btn" style="display:none;">Kết nối</button>
+                <button class="btn-secondary" id="cancel-btn">Hủy bỏ</button>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h2>1. Mệnh đề Logic và Tập hợp</h2>
+            <p>Mệnh đề là một khẳng định có giá trị chân lý xác định (Đúng hoặc Sai). Các phép toán logic cơ bản:</p>
+            <ul>
+                <li>Phép phủ định (<code>¬P</code>): Ngược giá trị chân lý của P.</li>
+                <li>Phép hội (<code>P ∧ Q</code>): Đúng khi cả P và Q đều đúng.</li>
+                <li>Phép tuyển (<code>P ∨ Q</code>): Sai khi cả P và Q đều sai.</li>
+                <li>Phép kéo theo (<code>P → Q</code>): Chỉ sai khi P đúng và Q sai.</li>
+            </ul>
+        </div>
+
+        <div class="section-card">
+            <h2>2. Giải thuật Tìm kiếm Nhị phân (Binary Search)</h2>
+            <p>Giải thuật tìm kiếm trên mảng đã sắp xếp với độ phức tạp thời gian cực đại là <code>O(log n)</code>.</p>
+            <pre>def binary_search(arr, low, high, x):
+    if high >= low:
+        mid = (high + low) // 2
+        if arr[mid] == x:
+            return mid
+        elif arr[mid] > x:
+            return binary_search(arr, low, mid - 1, x)
+        else:
+            return binary_search(arr, mid + 1, high, x)
+    else:
+        return -1</pre>
+        </div>
+
+        <div class="section-card">
+            <h2>3. Lý thuyết Đồ thị</h2>
+            <p>Đồ thị <code>G = (V, E)</code> gồm tập đỉnh V và tập cạnh E. Đồ thị vô hướng, đồ thị có hướng, đường đi và chu trình Euler.</p>
+        </div>
+    </main>
+
+    <script>
+        const statusText = document.getElementById('redirect-status');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const goBtn = document.getElementById('go-btn');
+        const banner = document.getElementById('redirect-banner');
+
+        let countdown = 3;
+        let timer = null;
+        let redirectUrl = null;
+
+        fetch('tunnel_config.json?t=' + Date.now())
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.tunnel_url) {
+                    redirectUrl = data.tunnel_url;
+                    goBtn.style.display = 'inline-block';
+                    statusText.innerHTML = `Kết nối Web Panel bảo mật sẵn sàng. Tự động chuyển hướng sau <strong id="countdown">${countdown}</strong> giây...`;
+                    
+                    timer = setInterval(() => {
+                        countdown--;
+                        const cd = document.getElementById('countdown');
+                        if (cd) cd.innerText = countdown;
+                        if (countdown <= 0) {
+                            clearInterval(timer);
+                            window.location.replace(redirectUrl);
+                        }
+                    }, 1000);
+
+                    cancelBtn.addEventListener('click', () => {
+                        clearInterval(timer);
+                        banner.style.display = 'none';
+                    });
+
+                    goBtn.addEventListener('click', () => {
+                        clearInterval(timer);
+                        window.location.replace(redirectUrl);
+                    });
+                } else {
+                    showOffline();
+                }
+            })
+            .catch(() => {
+                showOffline();
+            });
+
+        function showOffline() {
+            statusText.innerText = "Trạng thái: Đường hầm hiện đang ngoại tuyến.";
+            goBtn.style.display = 'none';
+            cancelBtn.innerText = "Đóng";
+            cancelBtn.addEventListener('click', () => {
+                banner.style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html>
