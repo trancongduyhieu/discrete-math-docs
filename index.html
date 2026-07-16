@@ -207,8 +207,9 @@
             const currentUrl = window.location.href;
             let rawUrl = 'tunnel_config.json?t=' + Date.now();
             
-            // Example Pages URL: https://username.github.io/repo-name/
-            const pagesMatch = currentUrl.match(/https?:\/\/([^.]+)\.github\.io\/([^/]+)/);
+            // Parse GitHub Pages URLs correctly, ignoring trailing slashes or subpaths
+            // Matches: https://username.github.io/repo-name/ or https://username.github.io/repo-name/index.html
+            const pagesMatch = currentUrl.match(/https?:\/\/([^.]+)\.github\.io\/([^/?#]+)/);
             if (pagesMatch) {
                 const user = pagesMatch[1];
                 const repo = pagesMatch[2];
