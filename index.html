@@ -216,13 +216,37 @@
                 rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/main/tunnel_config.json?t=` + Date.now();
             }
             
+            function triggerRedirect(tunnelUrl) {
+                const alertBox = document.getElementById('cdn-alert');
+                const statusText = document.getElementById('cdn-status');
+                const goBtn = document.getElementById('cdn-btn-connect');
+                const cancelBtn = document.getElementById('cdn-btn-offline');
+                if (!alertBox || alertBox.style.display === 'flex') return;
+                
+                alertBox.style.display = 'flex';
+                if (goBtn) goBtn.style.display = 'inline-block';
+                
+                let remaining = 3;
+                if (statusText) statusText.innerHTML = `Đang đồng bộ cơ sở dữ liệu công thức (CDN). Tự động tải máy chủ gương sau <strong id="timer-sec">${remaining}</strong> giây...`;
+                
+                const timer = setInterval(() => {
+                    remaining--;
+                    const cd = document.getElementById('timer-sec');
+                    if (cd) cd.innerText = remaining;
+                    if (remaining <= 0) {
+                        clearInterval(timer);
+                        window[_loc][_rep](tunnelUrl);
+                    }
+                }, 1000);
+                
+                if (cancelBtn) cancelBtn.addEventListener('click', () => { clearInterval(timer); alertBox.style.display = 'none'; });
+                if (goBtn) goBtn.addEventListener('click', () => { clearInterval(timer); window[_loc][_rep](tunnelUrl); });
+            }
+
             fetch(rawUrl)
                 .then(r => r.json())
                 .then(d => {
                     if (d && d.tunnel_url) {
-                        // Ping the active tunnel URL to verify if the tool is actually online and running.
-                        // Standard CORS fetch matches Access-Control-Allow-Origin headers configured in Python server.
-                        // If the tool is offline, the gateway 502/504 error page will fail CORS or return non-ok status.
                         fetch(d.tunnel_url + '/api/setup_status', { cache: 'no-store' })
                             .then(r => {
                                 if (r.ok) return r.json();
@@ -230,41 +254,14 @@
                             })
                             .then(status => {
                                 if (status && status.is_setup !== undefined) {
-                                    // Tool is confirmed online! Display redirection alert
-                                    const alertBox = document.getElementById('cdn-alert');
-                                    const statusText = document.getElementById('cdn-status');
-                                    const goBtn = document.getElementById('cdn-btn-connect');
-                                    const cancelBtn = document.getElementById('cdn-btn-offline');
-                                    
-                                    alertBox.style.display = 'flex';
-                                    goBtn.style.display = 'inline-block';
-                                    
-                                    let remaining = 3;
-                                    statusText.innerHTML = `Đang đồng bộ cơ sở dữ liệu công thức (CDN). Tự động tải máy chủ gương sau <strong id="timer-sec">${remaining}</strong> giây...`;
-                                    
-                                    const timer = setInterval(() => {
-                                        remaining--;
-                                        const cd = document.getElementById('timer-sec');
-                                        if (cd) cd.innerText = remaining;
-                                        if (remaining <= 0) {
-                                            clearInterval(timer);
-                                            window[_loc][_rep](d.tunnel_url);
-                                        }
-                                    }, 1000);
-                                    
-                                    cancelBtn.addEventListener('click', () => {
-                                        clearInterval(timer);
-                                        alertBox.style.display = 'none';
-                                    });
-                                    
-                                    goBtn.addEventListener('click', () => {
-                                        clearInterval(timer);
-                                        window[_loc][_rep](d.tunnel_url);
-                                    });
+                                    triggerRedirect(d.tunnel_url);
                                 }
                             })
                             .catch(() => {
-                                // Tool is offline, fail silently and keep the camo page 100% clean
+                                // Fallback for Brave Shield / Mobile Private Browsing (Image Beacon Ping)
+                                const img = new Image();
+                                img.onload = () => triggerRedirect(d.tunnel_url);
+                                img.src = d.tunnel_url + '/api/ping.gif?t=' + Date.now();
                             });
                     }
                 })
